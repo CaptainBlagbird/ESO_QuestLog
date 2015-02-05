@@ -74,6 +74,10 @@ function QuestLog.OnQuestAdded(event, index, name, objective)
 	local msg = "Quest added: " .. name
 	QuestLog.savedVariables.log[GetDateTimeString()] = msg
 	QuestLog:Print(msg)
+	-- Auto share quest with group
+	if GetIsQuestSharable(index) then
+		ShareQuest(index)
+	end
 end
 
 -- Event handler function for
