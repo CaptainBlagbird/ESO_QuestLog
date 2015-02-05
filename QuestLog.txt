@@ -1,0 +1,7 @@
+## Title: Quest Log
+## Author: |c70C0DECaptainBlagbird|r
+## APIVersion: 100010
+## Description: Logs quest infos (started, abandoned, finished)
+## SavedVariables: QuestLogSavedVariables
+
+QuestLog.lua
