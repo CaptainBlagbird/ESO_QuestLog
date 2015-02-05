@@ -14,6 +14,8 @@ QuestLog.name = "QuestLog"
 QuestLog.init = false
 QuestLog.msgColor = "70C0DE"
 QuestLog.msgPrefix = "|r|c" .. QuestLog.msgColor .. "[" .. QuestLog.name .. "] |r|cFFFF00"
+QuestLog.timer = {}
+QuestLog.timer.enabled = false
  
 -- Initialisations
 function QuestLog:Init()
@@ -47,6 +49,29 @@ local function GetDateTimeString()
 	local ms = string.sub(gms, -3, -1)
 	-- Return string in ISO format
 	return year .. "-" .. mon .. "-" .. day .. " " .. h .. ":" .. m .. ":" .. s .. "." .. ms
+end 
+
+-- Function to start the timer
+function QuestLog.timer.start(ms)
+	QuestLog.timer.startTimeStamp = GetGameTimeMilliseconds()
+	QuestLog.timer.durationMs = ms
+	QuestLog.timer.enabled = true
+end
+
+-- Function to check if timer finished
+function QuestLog.timer.finished()
+	if GetGameTimeMilliseconds() >= QuestLog.timer.startTimeStamp + QuestLog.timer.durationMs then
+		QuestLog.timer.enabled = false
+		return true
+	end
+end
+
+-- Event handler function, called when the UI gets updated
+function QuestLog.OnUIUpdate()
+	if not QuestLog.timer.enabled then return end
+	if QuestLog.timer.finished() then
+		d('bla')
+	end
 end
 
 -- Event handler function for EVENT_ADD_ON_LOADED
@@ -57,6 +82,7 @@ function QuestLog.OnAddOnLoaded(event, addonName)
 	-- Initialise addon
 	QuestLog:Init()
 	QuestLog.init = true
+	EVENT_MANAGER:UnregisterForEvent(QuestLog.name, EVENT_ADD_ON_LOADED)
 end
 
 -- Event handler function for EVENT_PLAYER_ACTIVATED
@@ -83,9 +109,8 @@ end
 -- Event handler function for
 -- EVENT_QUEST_REMOVED (integer eventCode, bool isCompleted, integer journalIndex, string questName, integer zoneIndex, integer poiIndex)
 function QuestLog.OnQuestRemoved(event, isComplete, index, name, zone, poi)
-	local comp = "unompleted"
-	if isComplete then comp = "completed" end
-	local msg = "Quest removed (" .. comp .."): " .. name
+	if isComplete then return end
+	local msg = "Quest abandoned: " .. name
 	QuestLog.savedVariables.log[GetDateTimeString()] = msg
 	QuestLog:Print(msg)
 end

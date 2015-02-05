@@ -1,0 +1,9 @@
+<GuiXml>
+	<Controls>
+		<TopLevelControl name="QuestLog">
+			<OnUpdate>
+				QuestLog.OnUIUpdate()
+			</OnUpdate>
+		</TopLevelControl>
+	</Controls>
+</GuiXml>

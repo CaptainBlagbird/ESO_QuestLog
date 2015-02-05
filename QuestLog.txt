@@ -4,4 +4,5 @@
 ## Description: Logs quest infos (started, abandoned, finished)
 ## SavedVariables: QuestLogSavedVariables
 
+QuestLog.xml
 QuestLog.lua
