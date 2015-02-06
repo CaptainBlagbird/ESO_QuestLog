@@ -143,7 +143,9 @@ end
 -- EVENT_QUEST_ADDED (integer eventCode, integer journalIndex, string questName, string objectiveName)
 function QuestLog.OnQuestAdded(event, index, name, objective)
 	local msg = "Quest added: " .. name
-	QuestLog.savedVariables.log[GetDateTimeString()] = msg
+	local posX, posY = GetMapPlayerPosition("player")
+	local strPos = string.format(" (%1.1f, %1.1f)", posX*100, posY*100)
+	QuestLog.savedVariables.log[GetDateTimeString()] = msg .. " @ " .. GetPlayerLocationName() .. strPos
 	QuestLog:Print(msg)
 	-- Auto share quest with group
 	if GetIsQuestSharable(index) then
@@ -163,8 +165,10 @@ end
 -- Event handler function for
 -- EVENT_QUEST_COMPLETE (integer eventCode, string questName, integer level, integer previousXP, integer currentXP, integer rank, integer previousPoints, integer currentPoints) 
 function QuestLog.OnQuestComplete(event, name, lvl, pXP, cXP, rnk, pPoints, cPoints)
-	local msg = "Quest complete (level=" .. lvl .. ", rank=" .. rnk .."): " .. name
-	QuestLog.savedVariables.log[GetDateTimeString()] = msg
+	local msg = "Quest complete: " .. name
+	local posX, posY = GetMapPlayerPosition("player")
+	local strPos = string.format(" (%1.1f, %1.1f)", posX*100, posY*100)
+	QuestLog.savedVariables.log[GetDateTimeString()] = msg .. " @ " .. GetPlayerLocationName() .. strPos
 	QuestLog:Print(msg)
 	
 	-- Start countdown for UI reloading
