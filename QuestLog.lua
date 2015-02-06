@@ -15,7 +15,8 @@ QuestLog.init = false
 QuestLog.msgColor = "70C0DE"
 QuestLog.msgPrefix = "|r|c" .. QuestLog.msgColor .. "[" .. QuestLog.name .. "] |r|cFFFF00"
 QuestLog.timer = {}
-QuestLog.timer.enabled = false
+QuestLog.timer[1] = {}
+QuestLog.timer[1].enabled = false
  
 -- Initialisations
 function QuestLog:Init()
@@ -54,26 +55,27 @@ local function GetDateTimeString()
 end
 
 -- Function to start the timer
-function QuestLog.timer.start(ms)
-	QuestLog.timer.startTimeStamp = GetGameTimeMilliseconds()
-	QuestLog.timer.durationMs = ms
-	QuestLog.timer.enabled = true
+function QuestLog.timer.start(i, ms)
+	QuestLog.timer[i].startTimeStamp = GetGameTimeMilliseconds()
+	QuestLog.timer[i].durationMs = ms
+	QuestLog.timer[i].enabled = true
 end
 
 -- Function to check remaining time
-function QuestLog.timer.getRemainingMs()
-	return QuestLog.timer.startTimeStamp + QuestLog.timer.durationMs - GetGameTimeMilliseconds()
+function QuestLog.timer.getRemainingMs(i)
+	return QuestLog.timer[i].startTimeStamp + QuestLog.timer[i].durationMs - GetGameTimeMilliseconds()
 end
 
 -- Event handler function, called when the QuestLogTimerUI gets updated
 function QuestLog.timer.OnUpdate()
-	if not QuestLog.timer.enabled then return end
-	local remainingMs = QuestLog.timer.getRemainingMs()
-	QuestLog.showDialog(remainingMs/1000)
-	if remainingMs <= 0 then
-		QuestLog.timer.enabled = false
-		if not IsUnitInCombat("player") then QuestLog.hideDialog() end
-		SavelyReloadUI()
+	if QuestLog.timer[1].enabled then
+		local remainingMs = QuestLog.timer.getRemainingMs(1)
+		QuestLog.showDialog(remainingMs/1000)
+		if remainingMs <= 0 then
+			QuestLog.timer[1].enabled = false
+			if not IsUnitInCombat("player") then QuestLog.hideDialog() end
+			SavelyReloadUI()
+		end
 	end
 end
 
@@ -97,14 +99,14 @@ end
 
 -- Function that gets called when the reload button was clicked
 function QuestLog.OnButtonReloadClicked()
-	QuestLog.timer.enabled = false
+	QuestLog.timer[1].enabled = false
 	if not IsUnitInCombat("player") then QuestLog.hideDialog() end
 	SavelyReloadUI()
 end
 
 -- Function that gets called when the cancel button was clicked
 function QuestLog.OnButtonCancelClicked()
-	QuestLog.timer.enabled = false
+	QuestLog.timer[1].enabled = false
 	QuestLog.hideDialog()
 end
 
@@ -157,7 +159,7 @@ function QuestLog.OnQuestComplete(event, name, lvl, pXP, cXP, rnk, pPoints, cPoi
 	QuestLog:Print(msg)
 	
 	-- Start countdown for UI reloading
-	QuestLog.timer.start(30000)
+	QuestLog.timer.start(1, 30000)
 end
 
 -- Reloads UI now (when player not in combat), or as soon as player left combat
