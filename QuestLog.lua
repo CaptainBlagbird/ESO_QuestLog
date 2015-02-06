@@ -65,8 +65,8 @@ function QuestLog.timer.getRemainingMs()
 	return QuestLog.timer.startTimeStamp + QuestLog.timer.durationMs - GetGameTimeMilliseconds()
 end
 
--- Event handler function, called when the UI gets updated
-function QuestLog.OnUIUpdate()
+-- Event handler function, called when the QuestLogTimerUI gets updated
+function QuestLog.timer.OnUpdate()
 	if not QuestLog.timer.enabled then return end
 	local remainingMs = QuestLog.timer.getRemainingMs()
 	QuestLog.showDialog(remainingMs/1000)
@@ -79,14 +79,7 @@ end
 
 -- Function to show the UI dialog box
 function QuestLog.showDialog(remainingSec)
-	if QuestLogUI.isHidden then
-		local isValidAnchor, point, relativeTo, relativePoint, offsetX, offsetY = QuestLogUI:GetAnchor()
-		-- if isValidAnchor then
-			QuestLogUI:ClearAnchors()
-			QuestLogUI:SetAnchor(point, relativeTo, relativePoint, offsetX, offsetY-5000)
-		-- end
-		QuestLogUI.isHidden = false
-	end
+	if QuestLogUI:IsHidden() then QuestLogUI:SetHidden(false) end
 	
 	if remainingSec >= 0 then
 		-- Display countdown
@@ -99,14 +92,7 @@ end
 
 -- Function to hide the UI dialog box
 function QuestLog.hideDialog()
-	if not QuestLogUI.isHidden then
-		local isValidAnchor, point, relativeTo, relativePoint, offsetX, offsetY = QuestLogUI:GetAnchor()
-		-- if isValidAnchor then
-			QuestLogUI:ClearAnchors()
-			QuestLogUI:SetAnchor(point, relativeTo, relativePoint, offsetX, offsetY+5000)
-		-- end
-		QuestLogUI.isHidden = true
-	end
+	if not QuestLogUI:IsHidden() then QuestLogUI:SetHidden(true) end
 end
 
 -- Function that gets called when the reload button was clicked

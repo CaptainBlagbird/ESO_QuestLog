@@ -4,10 +4,6 @@
 			<Dimensions x="450" y="250" />
 			<Anchor point="CENTER" offsetY="-200" />
 			
-			<OnUpdate>
-				QuestLog.OnUIUpdate()
-			</OnUpdate>
-			
 			<Controls>
 				<Backdrop name="$(parent)Backdrop" edgeColor="444444" centerColor="222222" alpha="0.8" >
 					<AnchorFill />
@@ -37,6 +33,12 @@
 					</OnClicked>
 				</Button>
 			</Controls>
+		</TopLevelControl>
+		
+		<TopLevelControl name="QuestLogTimerUI" >
+			<OnUpdate>
+				QuestLog.timer.OnUpdate()
+			</OnUpdate>
 		</TopLevelControl>
 	</Controls>
 </GuiXml>
