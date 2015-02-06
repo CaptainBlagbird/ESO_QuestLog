@@ -34,25 +34,6 @@ function QuestLog:Print(str)
 	d(QuestLog.msgPrefix .. str)
 end
 
--- Check if player busy
-function QuestLog.isPlayerBusy()
-	return IsUnitInCombat("player") or IsReticleHidden() or IsInteractionCameraActive() or GetNumLootItems() > 0
-end
--- Register all events that are used to check if player still busy
-function QuestLog.registerBusyEvents(registerName)
-	EVENT_MANAGER:RegisterForEvent(registerName, EVENT_PLAYER_COMBAT_STATE,   OnPlayerBusyChanged)
-	EVENT_MANAGER:RegisterForEvent(registerName, EVENT_RETICLE_HIDDEN_UPDATE, OnPlayerBusyChanged)
-	EVENT_MANAGER:RegisterForEvent(registerName, EVENT_CHATTER_END,           OnPlayerBusyChanged)
-	EVENT_MANAGER:RegisterForEvent(registerName, EVENT_LOOT_CLOSED,           OnPlayerBusyChanged)
-end
--- Register all events that are used to check if player still busy
-function QuestLog.unregisterBusyEvents(registerName)
-	EVENT_MANAGER:UnregisterForEvent(registerName, EVENT_PLAYER_COMBAT_STATE)
-	EVENT_MANAGER:UnregisterForEvent(registerName, EVENT_RETICLE_HIDDEN_UPDATE)
-	EVENT_MANAGER:UnregisterForEvent(registerName, EVENT_CHATTER_END)
-	EVENT_MANAGER:UnregisterForEvent(registerName, EVENT_LOOT_CLOSED)
-end
-
 -- Get formated datetime string ("YYYY-MM-DD hh:mm:ss")
 local function GetDateTimeString()
 	-- Get the date as formated number and convert it to a string (with leading zeros)
@@ -73,6 +54,36 @@ local function GetDateTimeString()
 	local ms = string.sub(gms, -3, -1)
 	-- Return string in ISO format
 	return year .. "-" .. mon .. "-" .. day .. " " .. h .. ":" .. m .. ":" .. s .. "." .. ms
+end
+
+-- Check if player busy
+function QuestLog.isPlayerBusy()
+	return IsUnitInCombat("player") or IsReticleHidden() or IsInteractionCameraActive() or GetNumLootItems() > 0
+end
+-- Register all events that are used to check if player still busy
+function QuestLog.registerBusyEvents(registerName)
+	EVENT_MANAGER:RegisterForEvent(registerName, EVENT_PLAYER_COMBAT_STATE,   OnPlayerBusyChanged)
+	EVENT_MANAGER:RegisterForEvent(registerName, EVENT_RETICLE_HIDDEN_UPDATE, OnPlayerBusyChanged)
+	EVENT_MANAGER:RegisterForEvent(registerName, EVENT_CHATTER_END,           OnPlayerBusyChanged)
+	EVENT_MANAGER:RegisterForEvent(registerName, EVENT_LOOT_CLOSED,           OnPlayerBusyChanged)
+end
+-- Register all events that are used to check if player still busy
+function QuestLog.unregisterBusyEvents(registerName)
+	EVENT_MANAGER:UnregisterForEvent(registerName, EVENT_PLAYER_COMBAT_STATE)
+	EVENT_MANAGER:UnregisterForEvent(registerName, EVENT_RETICLE_HIDDEN_UPDATE)
+	EVENT_MANAGER:UnregisterForEvent(registerName, EVENT_CHATTER_END)
+	EVENT_MANAGER:UnregisterForEvent(registerName, EVENT_LOOT_CLOSED)
+end
+
+-- Event handler function for EVENT_PLAYER_COMBAT_STATE
+function OnPlayerBusyChanged(event)
+	-- Check if busy
+	if not QuestLog.isPlayerBusy() then
+		-- Wait another 2 seconds and then reload the UI (in the timer function)
+		QuestLog.timer.start("postCombatDelay", 2000)
+		-- We don't need the events anymore, unregister it
+		QuestLog.unregisterBusyEvents(QuestLog.name .. "SavelyReloadUI")
+	end
 end
 
 -- Event handler function for EVENT_ADD_ON_LOADED
@@ -130,7 +141,7 @@ function QuestLog.OnQuestComplete(event, name, lvl, pXP, cXP, rnk, pPoints, cPoi
 	
 	-- Check value: Negative = disabled
 	if QuestLog.settings.countdownTimeS >= 0 then
-	-- Start countdown for UI reloading
+		-- Start countdown for UI reloading
 		QuestLog.timer.start("dialogCountdown", QuestLog.settings.countdownTimeS*1000)
 	end
 end

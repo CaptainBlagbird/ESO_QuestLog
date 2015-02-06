@@ -52,14 +52,3 @@ function SavelyReloadUI()
 		ReloadUI()
 	end
 end
-
--- Event handler function for EVENT_PLAYER_COMBAT_STATE
-function OnPlayerBusyChanged(event)
-	-- Check if busy
-	if not QuestLog.isPlayerBusy() then
-		-- Wait another 2 seconds and then reload the UI (in the timer function)
-		QuestLog.timer.start("postCombatDelay", 2000)
-		-- We don't need the event anymore, unregister it
-		QuestLog.unregisterBusyEvents(QuestLog.name .. "SavelyReloadUI")
-	end
-end
