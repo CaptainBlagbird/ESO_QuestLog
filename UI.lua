@@ -17,8 +17,8 @@ function QuestLog.showDialog(remainingSec)
 		-- Display countdown
 		QuestLogUICountdownLabel:SetText(string.format("Reloading UI in |cFF0000%02d|r s", remainingSec))
 	else
-		-- Display combat info
-		QuestLogUICountdownLabel:SetText("|cFF0000Reloading UI after combat|r")
+		-- Display busy player info
+		QuestLogUICountdownLabel:SetText("|cFF0000Waiting before reloading UI while player is busy|r")
 	end
 end
 
@@ -30,22 +30,23 @@ end
 -- Function that gets called when the reload button was clicked
 function QuestLog.OnButtonReloadClicked()
 	QuestLog.timer["dialogCountdown"].enabled = false
-	if not IsUnitInCombat("player") then QuestLog.hideDialog() end
-	SavelyReloadUI()
+	if not QuestLog.isPlayerBusy() then QuestLog.hideDialog() end
+	ReloadUI()
 end
 
 -- Function that gets called when the cancel button was clicked
 function QuestLog.OnButtonCancelClicked()
 	QuestLog.timer["dialogCountdown"].enabled = false
+	QuestLog.unregisterBusyEvents(QuestLog.name .. "SavelyReloadUI")
 	QuestLog.hideDialog()
 end
 
--- Reloads UI now (when player not in combat), or as soon as player left combat
+-- Reloads UI now (when player not busy), or as soon as player is ready again
 function SavelyReloadUI()
 	-- Check if it's save to reload UI
-	if IsUnitInCombat("player") then
-		-- Register combat event to reload UI after combat
-		EVENT_MANAGER:RegisterForEvent("SavelyReloadUI", EVENT_PLAYER_COMBAT_STATE, OnCombatStateChanged)
+	if QuestLog.isPlayerBusy() then
+		-- Register events to reload UI detect when player not busy anymore
+		QuestLog.registerBusyEvents(QuestLog.name .. "SavelyReloadUI")
 	else
 		-- Reload now so the file is written
 		ReloadUI()
@@ -53,12 +54,12 @@ function SavelyReloadUI()
 end
 
 -- Event handler function for EVENT_PLAYER_COMBAT_STATE
-function OnCombatStateChanged(event, inCombat)
-	-- Check if left combat
-	if not inCombat then
+function OnPlayerBusyChanged(event)
+	-- Check if busy
+	if not QuestLog.isPlayerBusy() then
 		-- Wait another 2 seconds and then reload the UI (in the timer function)
 		QuestLog.timer.start("postCombatDelay", 2000)
 		-- We don't need the event anymore, unregister it
-		EVENT_MANAGER:UnregisterForEvent("SavelyReloadUI", EVENT_PLAYER_COMBAT_STATE)
+		QuestLog.unregisterBusyEvents(QuestLog.name .. "SavelyReloadUI")
 	end
 end

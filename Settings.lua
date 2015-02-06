@@ -42,7 +42,7 @@ local optionsTable = {
 			},
 			[4] = {
 				type = "description",
-				text = "This addon will never reload the UI while the player is in combat, it will wait until after combat!",
+				text = "This addon will never reload the UI while the player is busy (combat/dialog), it will wait until player is ready!",
 				width = "full",
 			},
 			[4] = {

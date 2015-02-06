@@ -34,6 +34,25 @@ function QuestLog:Print(str)
 	d(QuestLog.msgPrefix .. str)
 end
 
+-- Check if player busy
+function QuestLog.isPlayerBusy()
+	return IsUnitInCombat("player") or IsReticleHidden() or IsInteractionCameraActive() or GetNumLootItems() > 0
+end
+-- Register all events that are used to check if player still busy
+function QuestLog.registerBusyEvents(registerName)
+	EVENT_MANAGER:RegisterForEvent(registerName, EVENT_PLAYER_COMBAT_STATE,   OnPlayerBusyChanged)
+	EVENT_MANAGER:RegisterForEvent(registerName, EVENT_RETICLE_HIDDEN_UPDATE, OnPlayerBusyChanged)
+	EVENT_MANAGER:RegisterForEvent(registerName, EVENT_CHATTER_END,           OnPlayerBusyChanged)
+	EVENT_MANAGER:RegisterForEvent(registerName, EVENT_LOOT_CLOSED,           OnPlayerBusyChanged)
+end
+-- Register all events that are used to check if player still busy
+function QuestLog.unregisterBusyEvents(registerName)
+	EVENT_MANAGER:UnregisterForEvent(registerName, EVENT_PLAYER_COMBAT_STATE)
+	EVENT_MANAGER:UnregisterForEvent(registerName, EVENT_RETICLE_HIDDEN_UPDATE)
+	EVENT_MANAGER:UnregisterForEvent(registerName, EVENT_CHATTER_END)
+	EVENT_MANAGER:UnregisterForEvent(registerName, EVENT_LOOT_CLOSED)
+end
+
 -- Get formated datetime string ("YYYY-MM-DD hh:mm:ss")
 local function GetDateTimeString()
 	-- Get the date as formated number and convert it to a string (with leading zeros)

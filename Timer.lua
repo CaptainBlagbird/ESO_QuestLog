@@ -33,7 +33,7 @@ function QuestLog.timer.OnUpdate()
 		QuestLog.showDialog(remainingMs/1000)
 		if remainingMs <= 0 then
 			QuestLog.timer["dialogCountdown"].enabled = false
-			if not IsUnitInCombat("player") then QuestLog.hideDialog() end
+			if not QuestLog.isPlayerBusy() then QuestLog.hideDialog() end
 			SavelyReloadUI()
 		end
 	end
