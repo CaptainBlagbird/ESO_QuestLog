@@ -51,7 +51,7 @@ local function GetDateTimeString()
 	local ms = string.sub(gms, -3, -1)
 	-- Return string in ISO format
 	return year .. "-" .. mon .. "-" .. day .. " " .. h .. ":" .. m .. ":" .. s .. "." .. ms
-end 
+end
 
 -- Function to start the timer
 function QuestLog.timer.start(ms)
@@ -72,7 +72,8 @@ function QuestLog.OnUIUpdate()
 	QuestLog.showDialog(remainingMs/1000)
 	if remainingMs <= 0 then
 		QuestLog.timer.enabled = false
-		QuestLog.hideDialog()
+		if not IsUnitInCombat("player") then QuestLog.hideDialog() end
+		SavelyReloadUI()
 	end
 end
 
@@ -91,7 +92,8 @@ function QuestLog.showDialog(remainingSec)
 		-- Display countdown
 		QuestLogUICountdownLabel:SetText(string.format("Reloading UI in |cFF0000%02d|r s", remainingSec))
 	else
-		SavelyReloadUI()
+		-- Display combat info
+		QuestLogUICountdownLabel:SetText("|cFF0000Reloading UI after combat|r")
 	end
 end
 
@@ -110,7 +112,7 @@ end
 -- Function that gets called when the reload button was clicked
 function QuestLog.OnButtonReloadClicked()
 	QuestLog.timer.enabled = false
-	QuestLog.hideDialog()
+	if not IsUnitInCombat("player") then QuestLog.hideDialog() end
 	SavelyReloadUI()
 end
 
