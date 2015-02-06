@@ -15,8 +15,10 @@ QuestLog.init = false
 QuestLog.msgColor = "70C0DE"
 QuestLog.msgPrefix = "|r|c" .. QuestLog.msgColor .. "[" .. QuestLog.name .. "] |r|cFFFF00"
 QuestLog.timer = {}
-QuestLog.timer[1] = {}
-QuestLog.timer[1].enabled = false
+QuestLog.timer["dialogCountdown"] = {}
+QuestLog.timer["dialogCountdown"].enabled = false
+QuestLog.timer["postCombatDelay"] = {}
+QuestLog.timer["postCombatDelay"].enabled = false
  
 -- Initialisations
 function QuestLog:Init()
@@ -68,12 +70,19 @@ end
 
 -- Event handler function, called when the QuestLogTimerUI gets updated
 function QuestLog.timer.OnUpdate()
-	if QuestLog.timer[1].enabled then
-		local remainingMs = QuestLog.timer.getRemainingMs(1)
+	if QuestLog.timer["dialogCountdown"].enabled then
+		local remainingMs = QuestLog.timer.getRemainingMs("dialogCountdown")
 		QuestLog.showDialog(remainingMs/1000)
 		if remainingMs <= 0 then
-			QuestLog.timer[1].enabled = false
+			QuestLog.timer["dialogCountdown"].enabled = false
 			if not IsUnitInCombat("player") then QuestLog.hideDialog() end
+			SavelyReloadUI()
+		end
+	end
+	
+	if QuestLog.timer["postCombatDelay"].enabled then
+		if QuestLog.timer.getRemainingMs("postCombatDelay") <= 0 then
+			QuestLog.timer["postCombatDelay"].enabled = false
 			SavelyReloadUI()
 		end
 	end
@@ -99,14 +108,14 @@ end
 
 -- Function that gets called when the reload button was clicked
 function QuestLog.OnButtonReloadClicked()
-	QuestLog.timer[1].enabled = false
+	QuestLog.timer["dialogCountdown"].enabled = false
 	if not IsUnitInCombat("player") then QuestLog.hideDialog() end
 	SavelyReloadUI()
 end
 
 -- Function that gets called when the cancel button was clicked
 function QuestLog.OnButtonCancelClicked()
-	QuestLog.timer[1].enabled = false
+	QuestLog.timer["dialogCountdown"].enabled = false
 	QuestLog.hideDialog()
 end
 
@@ -159,7 +168,7 @@ function QuestLog.OnQuestComplete(event, name, lvl, pXP, cXP, rnk, pPoints, cPoi
 	QuestLog:Print(msg)
 	
 	-- Start countdown for UI reloading
-	QuestLog.timer.start(1, 30000)
+	QuestLog.timer.start("dialogCountdown", 30000)
 end
 
 -- Reloads UI now (when player not in combat), or as soon as player left combat
@@ -178,8 +187,8 @@ end
 function OnCombatStateChanged(event, inCombat)
 	-- Check if left combat
 	if not inCombat then
-		-- Now it's save to reload the UI so the file is written
-		ReloadUI()
+		-- Wait another 2 seconds and then reload the UI (in the timer function)
+		QuestLog.timer.start("postCombatDelay", 2000)
 		-- We don't need the event anymore, unregister it
 		EVENT_MANAGER:UnregisterForEvent("SavelyReloadUI", EVENT_PLAYER_COMBAT_STATE)
 	end
