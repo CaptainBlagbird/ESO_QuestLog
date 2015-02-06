@@ -16,7 +16,6 @@ QuestLog.msgColor = "70C0DE"
 QuestLog.msgPrefix = "|r|c" .. QuestLog.msgColor .. "[" .. QuestLog.name .. "] |r|cFFFF00"
 QuestLog.timer = {}
 QuestLog.timer.enabled = false
-QuestLogUI.isHidden = false
  
 -- Initialisations
 function QuestLog:Init()
@@ -110,12 +109,15 @@ end
 
 -- Function that gets called when the reload button was clicked
 function QuestLog.OnButtonReloadClicked()
-	--TODO
+	QuestLog.timer.enabled = false
+	QuestLog.hideDialog()
+	SavelyReloadUI()
 end
 
 -- Function that gets called when the cancel button was clicked
 function QuestLog.OnButtonCancelClicked()
-	--TODO
+	QuestLog.timer.enabled = false
+	QuestLog.hideDialog()
 end
 
 -- Event handler function for EVENT_ADD_ON_LOADED
@@ -148,9 +150,6 @@ function QuestLog.OnQuestAdded(event, index, name, objective)
 	if GetIsQuestSharable(index) then
 		ShareQuest(index)
 	end
-
-	--TODO: just for testing, remove and add to OnQuestComplete
-	QuestLog.timer.start(30000)
 end
 
 -- Event handler function for
@@ -160,9 +159,6 @@ function QuestLog.OnQuestRemoved(event, isComplete, index, name, zone, poi)
 	local msg = "Quest abandoned: " .. name
 	QuestLog.savedVariables.log[GetDateTimeString()] = msg
 	QuestLog:Print(msg)
-	
-	--TODO: just for testing, remove and add to OnQuestComplete
-	QuestLog.timer.start(30000)
 end
 
 -- Event handler function for
