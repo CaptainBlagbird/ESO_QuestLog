@@ -6,3 +6,5 @@
 
 QuestLog.xml
 QuestLog.lua
+Timer.lua
+UI.lua

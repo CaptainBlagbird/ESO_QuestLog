@@ -1,6 +1,6 @@
 --[[
 
-Helmet Toggle
+Quest log
 by CaptainBlagbird
 https://github.com/CaptainBlagbird
 
@@ -14,11 +14,6 @@ QuestLog.name = "QuestLog"
 QuestLog.init = false
 QuestLog.msgColor = "70C0DE"
 QuestLog.msgPrefix = "|r|c" .. QuestLog.msgColor .. "[" .. QuestLog.name .. "] |r|cFFFF00"
-QuestLog.timer = {}
-QuestLog.timer["dialogCountdown"] = {}
-QuestLog.timer["dialogCountdown"].enabled = false
-QuestLog.timer["postCombatDelay"] = {}
-QuestLog.timer["postCombatDelay"].enabled = false
  
 -- Initialisations
 function QuestLog:Init()
@@ -54,69 +49,6 @@ local function GetDateTimeString()
 	local ms = string.sub(gms, -3, -1)
 	-- Return string in ISO format
 	return year .. "-" .. mon .. "-" .. day .. " " .. h .. ":" .. m .. ":" .. s .. "." .. ms
-end
-
--- Function to start the timer
-function QuestLog.timer.start(i, ms)
-	QuestLog.timer[i].startTimeStamp = GetGameTimeMilliseconds()
-	QuestLog.timer[i].durationMs = ms
-	QuestLog.timer[i].enabled = true
-end
-
--- Function to check remaining time
-function QuestLog.timer.getRemainingMs(i)
-	return QuestLog.timer[i].startTimeStamp + QuestLog.timer[i].durationMs - GetGameTimeMilliseconds()
-end
-
--- Event handler function, called when the QuestLogTimerUI gets updated
-function QuestLog.timer.OnUpdate()
-	if QuestLog.timer["dialogCountdown"].enabled then
-		local remainingMs = QuestLog.timer.getRemainingMs("dialogCountdown")
-		QuestLog.showDialog(remainingMs/1000)
-		if remainingMs <= 0 then
-			QuestLog.timer["dialogCountdown"].enabled = false
-			if not IsUnitInCombat("player") then QuestLog.hideDialog() end
-			SavelyReloadUI()
-		end
-	end
-	
-	if QuestLog.timer["postCombatDelay"].enabled then
-		if QuestLog.timer.getRemainingMs("postCombatDelay") <= 0 then
-			QuestLog.timer["postCombatDelay"].enabled = false
-			SavelyReloadUI()
-		end
-	end
-end
-
--- Function to show the UI dialog box
-function QuestLog.showDialog(remainingSec)
-	if QuestLogUI:IsHidden() then QuestLogUI:SetHidden(false) end
-	
-	if remainingSec >= 0 then
-		-- Display countdown
-		QuestLogUICountdownLabel:SetText(string.format("Reloading UI in |cFF0000%02d|r s", remainingSec))
-	else
-		-- Display combat info
-		QuestLogUICountdownLabel:SetText("|cFF0000Reloading UI after combat|r")
-	end
-end
-
--- Function to hide the UI dialog box
-function QuestLog.hideDialog()
-	if not QuestLogUI:IsHidden() then QuestLogUI:SetHidden(true) end
-end
-
--- Function that gets called when the reload button was clicked
-function QuestLog.OnButtonReloadClicked()
-	QuestLog.timer["dialogCountdown"].enabled = false
-	if not IsUnitInCombat("player") then QuestLog.hideDialog() end
-	SavelyReloadUI()
-end
-
--- Function that gets called when the cancel button was clicked
-function QuestLog.OnButtonCancelClicked()
-	QuestLog.timer["dialogCountdown"].enabled = false
-	QuestLog.hideDialog()
 end
 
 -- Event handler function for EVENT_ADD_ON_LOADED
@@ -173,29 +105,6 @@ function QuestLog.OnQuestComplete(event, name, lvl, pXP, cXP, rnk, pPoints, cPoi
 	
 	-- Start countdown for UI reloading
 	QuestLog.timer.start("dialogCountdown", 30000)
-end
-
--- Reloads UI now (when player not in combat), or as soon as player left combat
-function SavelyReloadUI()
-	-- Check if it's save to reload UI
-	if IsUnitInCombat("player") then
-		-- Register combat event to reload UI after combat
-		EVENT_MANAGER:RegisterForEvent("SavelyReloadUI", EVENT_PLAYER_COMBAT_STATE, OnCombatStateChanged)
-	else
-		-- Reload now so the file is written
-		ReloadUI()
-	end
-end
-
--- Event handler function for EVENT_PLAYER_COMBAT_STATE
-function OnCombatStateChanged(event, inCombat)
-	-- Check if left combat
-	if not inCombat then
-		-- Wait another 2 seconds and then reload the UI (in the timer function)
-		QuestLog.timer.start("postCombatDelay", 2000)
-		-- We don't need the event anymore, unregister it
-		EVENT_MANAGER:UnregisterForEvent("SavelyReloadUI", EVENT_PLAYER_COMBAT_STATE)
-	end
 end
 
 -- Registering the event handler functions for the events
