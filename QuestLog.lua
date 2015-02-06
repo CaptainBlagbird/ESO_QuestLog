@@ -10,18 +10,21 @@ https://github.com/CaptainBlagbird
 QuestLog = {}
 -- Addon info
 QuestLog.name = "QuestLog"
--- Other info
+-- Other variables
 QuestLog.init = false
 QuestLog.msgColor = "70C0DE"
 QuestLog.msgPrefix = "|r|c" .. QuestLog.msgColor .. "[" .. QuestLog.name .. "] |r|cFFFF00"
 QuestLog.timer = {}
 QuestLog.timer.enabled = false
+QuestLogUI.isHidden = false
  
 -- Initialisations
 function QuestLog:Init()
 	-- Set up SavedVariables object
 	self.savedVariables = ZO_SavedVars:New("QuestLogSavedVariables", 1, nil, {})
 	if QuestLog.savedVariables.log == nil then QuestLog.savedVariables.log = {} end
+	
+	QuestLog.hideDialog()
 end
 
 -- Print
@@ -58,20 +61,61 @@ function QuestLog.timer.start(ms)
 	QuestLog.timer.enabled = true
 end
 
--- Function to check if timer finished
-function QuestLog.timer.finished()
-	if GetGameTimeMilliseconds() >= QuestLog.timer.startTimeStamp + QuestLog.timer.durationMs then
-		QuestLog.timer.enabled = false
-		return true
-	end
+-- Function to check remaining time
+function QuestLog.timer.getRemainingMs()
+	return QuestLog.timer.startTimeStamp + QuestLog.timer.durationMs - GetGameTimeMilliseconds()
 end
 
 -- Event handler function, called when the UI gets updated
 function QuestLog.OnUIUpdate()
 	if not QuestLog.timer.enabled then return end
-	if QuestLog.timer.finished() then
-		d('bla')
+	local remainingMs = QuestLog.timer.getRemainingMs()
+	QuestLog.showDialog(remainingMs/1000)
+	if remainingMs <= 0 then
+		QuestLog.timer.enabled = false
+		QuestLog.hideDialog()
 	end
+end
+
+-- Function to show the UI dialog box
+function QuestLog.showDialog(remainingSec)
+	if QuestLogUI.isHidden then
+		local isValidAnchor, point, relativeTo, relativePoint, offsetX, offsetY = QuestLogUI:GetAnchor()
+		-- if isValidAnchor then
+			QuestLogUI:ClearAnchors()
+			QuestLogUI:SetAnchor(point, relativeTo, relativePoint, offsetX, offsetY-5000)
+		-- end
+		QuestLogUI.isHidden = false
+	end
+	
+	if remainingSec >= 0 then
+		-- Display countdown
+		QuestLogUICountdownLabel:SetText(string.format("Reloading UI in |cFF0000%02d|r s", remainingSec))
+	else
+		SavelyReloadUI()
+	end
+end
+
+-- Function to hide the UI dialog box
+function QuestLog.hideDialog()
+	if not QuestLogUI.isHidden then
+		local isValidAnchor, point, relativeTo, relativePoint, offsetX, offsetY = QuestLogUI:GetAnchor()
+		-- if isValidAnchor then
+			QuestLogUI:ClearAnchors()
+			QuestLogUI:SetAnchor(point, relativeTo, relativePoint, offsetX, offsetY+5000)
+		-- end
+		QuestLogUI.isHidden = true
+	end
+end
+
+-- Function that gets called when the reload button was clicked
+function QuestLog.OnButtonReloadClicked()
+	--TODO
+end
+
+-- Function that gets called when the cancel button was clicked
+function QuestLog.OnButtonCancelClicked()
+	--TODO
 end
 
 -- Event handler function for EVENT_ADD_ON_LOADED
@@ -104,6 +148,9 @@ function QuestLog.OnQuestAdded(event, index, name, objective)
 	if GetIsQuestSharable(index) then
 		ShareQuest(index)
 	end
+
+	--TODO: just for testing, remove and add to OnQuestComplete
+	QuestLog.timer.start(30000)
 end
 
 -- Event handler function for
@@ -113,6 +160,9 @@ function QuestLog.OnQuestRemoved(event, isComplete, index, name, zone, poi)
 	local msg = "Quest abandoned: " .. name
 	QuestLog.savedVariables.log[GetDateTimeString()] = msg
 	QuestLog:Print(msg)
+	
+	--TODO: just for testing, remove and add to OnQuestComplete
+	QuestLog.timer.start(30000)
 end
 
 -- Event handler function for
@@ -120,26 +170,32 @@ end
 function QuestLog.OnQuestComplete(event, name, lvl, pXP, cXP, rnk, pPoints, cPoints)
 	local msg = "Quest complete (level=" .. lvl .. ", rank=" .. rnk .."): " .. name
 	QuestLog.savedVariables.log[GetDateTimeString()] = msg
+	QuestLog:Print(msg)
 	
+	-- Start countdown for UI reloading
+	QuestLog.timer.start(30000)
+end
+
+-- Reloads UI now (when player not in combat), or as soon as player left combat
+function SavelyReloadUI()
 	-- Check if it's save to reload UI
 	if IsUnitInCombat("player") then
 		-- Register combat event to reload UI after combat
-		EVENT_MANAGER:RegisterForEvent(QuestLog.name, EVENT_PLAYER_COMBAT_STATE, QuestLog.OnCombatStateChanged)
+		EVENT_MANAGER:RegisterForEvent("SavelyReloadUI", EVENT_PLAYER_COMBAT_STATE, OnCombatStateChanged)
 	else
 		-- Reload now so the file is written
 		ReloadUI()
 	end
-	QuestLog:Print(msg)
 end
 
 -- Event handler function for EVENT_PLAYER_COMBAT_STATE
-function QuestLog.OnCombatStateChanged(event, inCombat)
+function OnCombatStateChanged(event, inCombat)
 	-- Check if left combat
 	if not inCombat then
 		-- Now it's save to reload the UI so the file is written
 		ReloadUI()
 		-- We don't need the event anymore, unregister it
-		EVENT_MANAGER:UnregisterForEvent(test.name, EVENT_PLAYER_COMBAT_STATE)
+		EVENT_MANAGER:UnregisterForEvent("SavelyReloadUI", EVENT_PLAYER_COMBAT_STATE)
 	end
 end
 

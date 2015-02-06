@@ -26,14 +26,14 @@
 					<Anchor point="BOTTOMLEFT" offsetX="20" offsetY="-20" />
 					<Dimensions x="150" y="24" />
 					<OnClicked>
-						test.OnButtonReloadClicked()
+						QuestLog.OnButtonReloadClicked()
 					</OnClicked>
 				</Button>
 				<Button name="$(parent)ButtonCancel" inherits="ZO_DefaultButton" text="Cancel">
 					<Anchor point="BOTTOMRIGHT" offsetX="-20" offsetY="-20" />
 					<Dimensions x="150" y="24" />
 					<OnClicked>
-						test.OnButtonCancelClicked()
+						QuestLog.OnButtonCancelClicked()
 					</OnClicked>
 				</Button>
 			</Controls>
