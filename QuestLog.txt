@@ -2,9 +2,11 @@
 ## Author: |c70C0DECaptainBlagbird|r
 ## APIVersion: 100010
 ## Description: Logs quest infos (started, abandoned, finished)
-## SavedVariables: QuestLogSavedVariables
+## SavedVariables: QuestLogFile QuestLogSettings
+## OptionalDependsOn: LibAddonMenu-2.0
 
 QuestLog.xml
 QuestLog.lua
 Timer.lua
 UI.lua
+Settings.lua

@@ -2,19 +2,19 @@
 	<Controls>
 		<TopLevelControl name="QuestLogUI" mouseEnabled="true" movable="true" >
 			<Dimensions x="450" y="250" />
-			<Anchor point="CENTER" offsetY="-200" />
+			<Anchor point="CENTER" offsetY="-400" />
 			
 			<Controls>
 				<Backdrop name="$(parent)Backdrop" edgeColor="444444" centerColor="222222" alpha="0.8" >
 					<AnchorFill />
 					<Edge edgeSize="2" />
 				</Backdrop>
-				<Label name="$(parent)Label" font="ZoFontGameLargeBoldShadow" color="C5C29E" wrapmode="ELLIPSIS"
-					text="|c70C0DE[QuestLog]|r info:&#xD;&#xA;The UI has to be reloaded in order to save the log file instantly. Normally the file is written when logging out, but if the game crashes before that, all logging of the current session would lost. (You can also manually reload the UI with the chat command |cFFFF00/reloadui|r)">
+				<Label name="$(parent)Label" font="ZoFontGameLargeBoldShadow" color="FFFFFF" wrapmode="ELLIPSIS"
+					text="|c70C0DE[QuestLog]|r info:&#xD;&#xA;The UI has to be reloaded in order to save the log file instantly. Normally the file is written when logging out, but if the game crashes before that, all logging of the current session would be lost. (You can also manually reload the UI with the chat command |cC5C29E/reloadui|r)">
 					<Dimensions x="440" y="240" />
 					<Anchor point="CENTER" />
 				</Label>
-				<Label name="$(parent)CountdownLabel" font="ZoFontGameLargeBoldShadow" color="C5C29E" wrapmode="ELLIPSIS"
+				<Label name="$(parent)CountdownLabel" font="ZoFontGameLargeBoldShadow" color="FFFFFF" wrapmode="ELLIPSIS"
 					text="Reloading UI in |cFF0000XX|r s">
 					<Anchor point="CENTER" offsetY="40" />
 				</Label>

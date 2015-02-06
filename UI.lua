@@ -8,7 +8,10 @@ https://github.com/CaptainBlagbird
 
 -- Function to show the UI dialog box
 function QuestLog.showDialog(remainingSec)
-	if QuestLogUI:IsHidden() then QuestLogUI:SetHidden(false) end
+	if QuestLogUI:IsHidden() then
+		QuestLogUI:SetHidden(false)
+		QuestLogUI:SetTopmost(true)
+	end
 	
 	if remainingSec >= 0 then
 		-- Display countdown

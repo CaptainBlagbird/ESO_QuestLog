@@ -17,9 +17,14 @@ QuestLog.msgPrefix = "|r|c" .. QuestLog.msgColor .. "[" .. QuestLog.name .. "] |
  
 -- Initialisations
 function QuestLog:Init()
-	-- Set up SavedVariables object
-	self.savedVariables = ZO_SavedVars:New("QuestLogSavedVariables", 1, nil, {})
+	-- Set up SavedVariables object (only for quest log data)
+	QuestLog.savedVariables = ZO_SavedVars:New("QuestLogFile", 1, nil, {})
 	if QuestLog.savedVariables.log == nil then QuestLog.savedVariables.log = {} end
+	
+	-- Set up SavedVariables object (for settings)
+	QuestLog.settings = ZO_SavedVars:New("QuestLogSettings", 1, nil, {})
+	if QuestLog.settings.countdownTimeS == nil then QuestLog.settings.countdownTimeS = 30 end
+	if QuestLog.settings.questShareEnabled == nil then QuestLog.settings.questShareEnabled = true end
 	
 	QuestLog.hideDialog()
 end
@@ -80,8 +85,9 @@ function QuestLog.OnQuestAdded(event, index, name, objective)
 	QuestLog.savedVariables.log[GetDateTimeString()] = msg .. " @ " .. GetPlayerLocationName() .. strPos
 	QuestLog:Print(msg)
 	-- Auto share quest with group
-	if GetIsQuestSharable(index) then
+	if IsUnitGrouped("player") and QuestLog.settings.questShareEnabled and GetIsQuestSharable(index) then
 		ShareQuest(index)
+		QuestLog:Print("Quest shared with group")
 	end
 end
 
@@ -103,8 +109,11 @@ function QuestLog.OnQuestComplete(event, name, lvl, pXP, cXP, rnk, pPoints, cPoi
 	QuestLog.savedVariables.log[GetDateTimeString()] = msg .. " @ " .. GetPlayerLocationName() .. strPos
 	QuestLog:Print(msg)
 	
+	-- Check value: Negative = disabled
+	if QuestLog.settings.countdownTimeS >= 0 then
 	-- Start countdown for UI reloading
-	QuestLog.timer.start("dialogCountdown", 30000)
+		QuestLog.timer.start("dialogCountdown", QuestLog.settings.countdownTimeS*1000)
+	end
 end
 
 -- Registering the event handler functions for the events
