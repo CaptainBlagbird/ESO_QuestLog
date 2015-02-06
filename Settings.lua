@@ -32,7 +32,7 @@ local optionsTable = {
 			[2] = {
 				type = "description",
 				title = "|cFF0000Please read|r",
-				text = "The UI has to be reloaded in order to save the log file instantly. Normally the file is written when logging out, but if the game crashes before that, all logging of the session would lost.",
+				text = "The UI has to be reloaded in order to save the log file instantly. Normally the file is written when logging out, but if the game crashes before that, all logging of the session would be lost.",
 				width = "full",
 			},
 			[3] = {
@@ -42,10 +42,10 @@ local optionsTable = {
 			},
 			[4] = {
 				type = "description",
-				text = "This addon will never reload the UI while the player is busy (combat/dialog), it will wait until player is ready!",
+				text = "This addon will never reload the UI while the player is busy (in combat/dialog/menu), it will wait until player is ready!",
 				width = "full",
 			},
-			[4] = {
+			[5] = {
 				type = "description",
 				title = "Note",
 				text = "You can always manually reload the UI with the chat command |cC5C29E/reloadui|r",

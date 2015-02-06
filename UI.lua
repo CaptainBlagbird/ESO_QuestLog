@@ -46,7 +46,7 @@ function SavelyReloadUI()
 	-- Check if it's save to reload UI
 	if QuestLog.isPlayerBusy() then
 		-- Register events to reload UI detect when player not busy anymore
-		QuestLog.registerBusyEvents(QuestLog.name .. "SavelyReloadUI")
+		QuestLog.registerBusyEvents(QuestLog.name .. "SavelyReloadUI", OnPlayerBusyChangedAfterDialog)
 	else
 		-- Reload now so the file is written
 		ReloadUI()

@@ -61,11 +61,11 @@ function QuestLog.isPlayerBusy()
 	return IsUnitInCombat("player") or IsReticleHidden() or IsInteractionCameraActive() or GetNumLootItems() > 0
 end
 -- Register all events that are used to check if player still busy
-function QuestLog.registerBusyEvents(registerName)
-	EVENT_MANAGER:RegisterForEvent(registerName, EVENT_PLAYER_COMBAT_STATE,   OnPlayerBusyChanged)
-	EVENT_MANAGER:RegisterForEvent(registerName, EVENT_RETICLE_HIDDEN_UPDATE, OnPlayerBusyChanged)
-	EVENT_MANAGER:RegisterForEvent(registerName, EVENT_CHATTER_END,           OnPlayerBusyChanged)
-	EVENT_MANAGER:RegisterForEvent(registerName, EVENT_LOOT_CLOSED,           OnPlayerBusyChanged)
+function QuestLog.registerBusyEvents(registerName, func)
+	EVENT_MANAGER:RegisterForEvent(registerName, EVENT_PLAYER_COMBAT_STATE,   func)
+	EVENT_MANAGER:RegisterForEvent(registerName, EVENT_RETICLE_HIDDEN_UPDATE, func)
+	EVENT_MANAGER:RegisterForEvent(registerName, EVENT_CHATTER_END,           func)
+	EVENT_MANAGER:RegisterForEvent(registerName, EVENT_LOOT_CLOSED,           func)
 end
 -- Register all events that are used to check if player still busy
 function QuestLog.unregisterBusyEvents(registerName)
@@ -75,8 +75,19 @@ function QuestLog.unregisterBusyEvents(registerName)
 	EVENT_MANAGER:UnregisterForEvent(registerName, EVENT_LOOT_CLOSED)
 end
 
--- Event handler function for EVENT_PLAYER_COMBAT_STATE
-function OnPlayerBusyChanged(event)
+-- Event handler function for 'player busy' events (before countdown dialog)
+function OnPlayerBusyChangedBeforeDialog(event)
+	-- Check if busy
+	if not QuestLog.isPlayerBusy() then
+		-- Start countdown for UI reloading
+		QuestLog.timer.start("dialogCountdown", QuestLog.settings.countdownTimeS*1000)
+		-- We don't need the events anymore, unregister it
+		QuestLog.unregisterBusyEvents(QuestLog.name .. "WaitBeforeDialog")
+	end
+end
+
+-- Event handler function for 'player busy' events (after countdown dialog)
+function OnPlayerBusyChangedAfterDialog(event)
 	-- Check if busy
 	if not QuestLog.isPlayerBusy() then
 		-- Wait another 2 seconds and then reload the UI (in the timer function)
@@ -141,8 +152,13 @@ function QuestLog.OnQuestComplete(event, name, lvl, pXP, cXP, rnk, pPoints, cPoi
 	
 	-- Check value: Negative = disabled
 	if QuestLog.settings.countdownTimeS >= 0 then
-		-- Start countdown for UI reloading
-		QuestLog.timer.start("dialogCountdown", QuestLog.settings.countdownTimeS*1000)
+		if not QuestLog.isPlayerBusy() then
+			-- Start countdown for UI reloading
+			QuestLog.timer.start("dialogCountdown", QuestLog.settings.countdownTimeS*1000)
+		else
+			-- Register events to reload UI when player not busy anymore
+			QuestLog.registerBusyEvents(QuestLog.name .. "WaitBeforeDialog", OnPlayerBusyChangedBeforeDialog)
+		end
 	end
 end
 
