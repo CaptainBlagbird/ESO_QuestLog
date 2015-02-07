@@ -2,7 +2,10 @@
 	<Controls>
 		<TopLevelControl name="QuestLogUI" mouseEnabled="true" movable="true" >
 			<Dimensions x="450" y="250" />
-			<Anchor point="CENTER" offsetY="-400" />
+			<Anchor point="CENTER" offsetY="-200" />
+			<OnMoveStop>
+				QuestLog.OnUIMoveStop()
+			</OnMoveStop>
 			
 			<Controls>
 				<Backdrop name="$(parent)Backdrop" edgeColor="444444" centerColor="222222" alpha="0.8" >

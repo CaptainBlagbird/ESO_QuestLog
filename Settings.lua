@@ -76,27 +76,43 @@ local optionsTable = {
 		width = "full",
 	},
 	[4] = {
+		type = "description",
+		title = "Position of the dialog box",
+		text = "",
+		width = "half",
+	},
+	[5] = {
+		type = "button",
+		name = "Reset",
+		tooltip = "Reset to default position",
+		func = function()
+				QuestLog.settings.position = {}
+				QuestLog:RestoreUIPosition()
+				end,
+		width = "half",
+	},
+	[6] = {
 		type = "header",
 		name = "",
 		width = "full",
 	},
-	[5] = {
-		type = "description",
-		text = "\r\n \r\n \r\n \r\n ",
-		width = "full",
-	},
-	[6] = {
-		type = "description",
-		text = "\r\n \r\n \r\n \r\n ",
-		width = "full",
-	},
 	[7] = {
+		type = "description",
+		text = "\r\n \r\n \r\n \r\n ",
+		width = "full",
+	},
+	[8] = {
+		type = "description",
+		text = "\r\n ",
+		width = "full",
+	},
+	[9] = {
 		type = "description",
 		title = "Clear log for current character",
 		text = "Type 'yes' to confirm",
 		width = "half",
 	},
-	[8] = {
+	[10] = {
 		type = "editbox",
 		name = " ",
 		tooltip = "Confirm log file clearing",
@@ -106,12 +122,12 @@ local optionsTable = {
 		width = "half",
 		default = "",
 	},
-	[9] = {
+	[11] = {
 		type = "description",
 		text = "|cFF0000Previously completed quests cannot be added again!|r",
 		width = "half",
 	},
-	[10] = {
+	[12] = {
 		type = "button",
 		name = "Clear log file",
 		tooltip = "Are you really sure?",

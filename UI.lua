@@ -27,6 +27,30 @@ function QuestLog.hideDialog()
 	if not QuestLogUI:IsHidden() then QuestLogUI:SetHidden(true) end
 end
 
+-- Event handler function, called after the UI was moved
+function QuestLog.OnUIMoveStop()
+	-- Store positions
+	QuestLog.settings.position.x = QuestLogUI:GetLeft()
+	QuestLog.settings.position.y = QuestLogUI:GetTop()
+end
+
+-- Function to restore the saved position of the dialog
+function QuestLog:RestoreUIPosition()
+	if QuestLog.settings.position == nil then QuestLog.settings.position = {} end
+	-- Get stored positions
+	local posX = QuestLog.settings.position.x
+	local posY = QuestLog.settings.position.y
+	
+	QuestLogUI:ClearAnchors()
+	if posX ~= nil or posY ~= nil then
+		-- Set position
+		QuestLogUI:SetAnchor(TOPLEFT, GuiRoot, TOPLEFT, posX, posY)
+	else
+		-- Set start position
+		QuestLogUI:SetAnchor(CENTER, GuiRoot, CENTER, 0, -200)
+	end
+end
+
 -- Function that gets called when the reload button was clicked
 function QuestLog.OnButtonReloadClicked()
 	QuestLog.timer["dialogCountdown"].enabled = false

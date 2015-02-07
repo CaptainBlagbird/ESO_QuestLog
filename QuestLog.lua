@@ -18,13 +18,16 @@ QuestLog.msgPrefix = "|r|c" .. QuestLog.msgColor .. "[" .. QuestLog.name .. "] |
 -- Initialisations
 function QuestLog:Init()
 	-- Set up SavedVariables object (only for quest log data)
-	QuestLog.savedVariables = ZO_SavedVars:New("QuestLogFile", 1, nil, {})
-	if QuestLog.savedVariables.log == nil then QuestLog.savedVariables.log = {} end
+	QuestLog.QuestLogFile = ZO_SavedVars:New("QuestLogFile", 1, nil, {})
+	if QuestLog.QuestLogFile.log == nil then QuestLog.QuestLogFile.log = {} end
 	
 	-- Set up SavedVariables object (for settings)
 	QuestLog.settings = ZO_SavedVars:New("QuestLogSettings", 1, nil, {})
 	if QuestLog.settings.countdownTimeS == nil then QuestLog.settings.countdownTimeS = 30 end
 	if QuestLog.settings.questShareEnabled == nil then QuestLog.settings.questShareEnabled = true end
+	
+	-- -- Restore position
+	QuestLog:RestoreUIPosition()
 	
 	QuestLog.hideDialog()
 end
@@ -123,7 +126,7 @@ function QuestLog.OnQuestAdded(event, index, name, objective)
 	local msg = "Quest added: " .. name
 	local posX, posY = GetMapPlayerPosition("player")
 	local strPos = string.format(" (%1.1f, %1.1f)", posX*100, posY*100)
-	QuestLog.savedVariables.log[GetDateTimeString()] = msg .. " @ " .. GetPlayerLocationName() .. strPos
+	QuestLog.QuestLogFile.log[GetDateTimeString()] = msg .. " @ " .. GetPlayerLocationName() .. strPos
 	QuestLog:Print(msg)
 	-- Auto share quest with group
 	if IsUnitGrouped("player") and QuestLog.settings.questShareEnabled and GetIsQuestSharable(index) then
@@ -137,7 +140,7 @@ end
 function QuestLog.OnQuestRemoved(event, isComplete, index, name, zone, poi)
 	if isComplete then return end
 	local msg = "Quest abandoned: " .. name
-	QuestLog.savedVariables.log[GetDateTimeString()] = msg
+	QuestLog.QuestLogFile.log[GetDateTimeString()] = msg
 	QuestLog:Print(msg)
 end
 
@@ -147,7 +150,7 @@ function QuestLog.OnQuestComplete(event, name, lvl, pXP, cXP, rnk, pPoints, cPoi
 	local msg = "Quest complete: " .. name
 	local posX, posY = GetMapPlayerPosition("player")
 	local strPos = string.format(" (%1.1f, %1.1f)", posX*100, posY*100)
-	QuestLog.savedVariables.log[GetDateTimeString()] = msg .. " @ " .. GetPlayerLocationName() .. strPos
+	QuestLog.QuestLogFile.log[GetDateTimeString()] = msg .. " @ " .. GetPlayerLocationName() .. strPos
 	QuestLog:Print(msg)
 	
 	-- Check value: Negative = disabled
