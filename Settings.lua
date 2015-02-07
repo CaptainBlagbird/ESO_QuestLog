@@ -16,6 +16,7 @@ local panelData = {
 	slashCommand = "/questlog",	--(optional) will register a keybind to open to this panel
 	registerForRefresh = true,	--boolean (optional) (will refresh all options controls when a setting is changed and when the panel is shown)
 	registerForDefaults = true,	--boolean (optional) (will set all options controls back to default values)
+	resetFunc = function() QuestLog.settings.position = {} end,
 }
 
 local optionsTable = {
@@ -55,6 +56,11 @@ local optionsTable = {
 	
 	},
 	[2] = {
+		type = "header",
+		name = "Main settings",
+		width = "full",
+	},
+	[3] = {
 		type = "slider",
 		name = "Auto reload UI countdown time [s]",
 		tooltip = "-1 to disable (no auto UI reload)",
@@ -66,7 +72,7 @@ local optionsTable = {
 		width = "full",
 		default = 30,
 	},
-	[3] = {
+	[4] = {
 		type = "checkbox",
 		name = "Auto share new quests with group",
 		tooltip = "When on, you'll automatically share the quest with the members of your current group so they can decide if they want to start the quest too",
@@ -75,13 +81,13 @@ local optionsTable = {
 		default = true,
 		width = "full",
 	},
-	[4] = {
+	[5] = {
 		type = "description",
 		title = "Position of the dialog box",
 		text = "",
 		width = "half",
 	},
-	[5] = {
+	[6] = {
 		type = "button",
 		name = "Reset",
 		tooltip = "Reset to default position",
@@ -91,56 +97,57 @@ local optionsTable = {
 				end,
 		width = "half",
 	},
-	[6] = {
-		type = "header",
-		name = "",
-		width = "full",
-	},
 	[7] = {
+		type = "submenu",
+		name = "Danger zone",
+		controls = {
+			[1] = {
+				type = "description",
+				title = "Clear log for current character",
+				text = "Type 'yes' to confirm",
+				width = "half",
+			},
+			[2] = {
+				type = "editbox",
+				name = " ",
+				tooltip = "Confirm log file clearing",
+				getFunc = function() return "" end,
+				setFunc = function(text) QuestLog.temp = text end,
+				isMultiline = false,
+				width = "half",
+				default = "",
+			},
+			[3] = {
+				type = "description",
+				text = "|cFF0000Previously completed quests cannot be added again!|r",
+				width = "half",
+			},
+			[4] = {
+				type = "button",
+				name = "Clear log file",
+				tooltip = "This cannot be undone!",
+				disabled = function() return QuestLog.temp ~= "yes" end,
+				func = function()
+							if QuestLog.temp == "yes" then
+								QuestLog.QuestLogFile.log = {}
+								QuestLog.temp = nil
+								ReloadUI()
+							end
+						end,
+				width = "half",
+				warning = "Will need to reload the UI.",
+			},
+		},
+	},
+	[8] = {
 		type = "description",
 		text = "\r\n \r\n \r\n \r\n ",
 		width = "full",
 	},
-	[8] = {
-		type = "description",
-		text = "\r\n ",
-		width = "full",
-	},
 	[9] = {
 		type = "description",
-		title = "Clear log for current character",
-		text = "Type 'yes' to confirm",
-		width = "half",
-	},
-	[10] = {
-		type = "editbox",
-		name = " ",
-		tooltip = "Confirm log file clearing",
-		getFunc = function() return "" end,
-		setFunc = function(text) QuestLog.temp = text end,
-		isMultiline = false,
-		width = "half",
-		default = "",
-	},
-	[11] = {
-		type = "description",
-		text = "|cFF0000Previously completed quests cannot be added again!|r",
-		width = "half",
-	},
-	[12] = {
-		type = "button",
-		name = "Clear log file",
-		tooltip = "This cannot be undone!",
-		disabled = function() return QuestLog.temp ~= "yes" end,
-		func = function()
-					if QuestLog.temp == "yes" then
-						QuestLog.QuestLogFile.log = {}
-						QuestLog.temp = nil
-						ReloadUI()
-					end
-				end,
-		width = "half",
-		warning = "Will need to reload the UI.",
+		text = "\r\n \r\n \r\n \r\n 'Reset to Defaults' does NOT reset quest log.",
+		width = "full",
 	},
 }
 
