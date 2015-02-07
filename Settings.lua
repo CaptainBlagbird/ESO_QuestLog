@@ -133,7 +133,7 @@ local optionsTable = {
 		tooltip = "Are you really sure?",
 		func = function()
 					if QuestLog.temp == "yes" then
-						QuestLog.savedVariables.log = nil
+						QuestLog.QuestLogFile.log = {}
 						QuestLog.temp = nil
 						ReloadUI()
 					end
