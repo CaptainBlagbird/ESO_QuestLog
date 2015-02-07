@@ -130,7 +130,8 @@ local optionsTable = {
 	[12] = {
 		type = "button",
 		name = "Clear log file",
-		tooltip = "Are you really sure?",
+		tooltip = "This cannot be undone!",
+		disabled = function() return QuestLog.temp ~= "yes" end,
 		func = function()
 					if QuestLog.temp == "yes" then
 						QuestLog.QuestLogFile.log = {}
@@ -139,7 +140,7 @@ local optionsTable = {
 					end
 				end,
 		width = "half",
-		warning = "This cannot be undone!\r\nWill need to reload the UI.",
+		warning = "Will need to reload the UI.",
 	},
 }
 
