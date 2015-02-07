@@ -82,16 +82,45 @@ local optionsTable = {
 	},
 	[5] = {
 		type = "description",
-		text = "|cFF0000Clear log file for current character:|r",
-		width = "half",
+		text = "\r\n \r\n \r\n \r\n ",
+		width = "full",
 	},
 	[6] = {
+		type = "description",
+		text = "\r\n \r\n \r\n \r\n ",
+		width = "full",
+	},
+	[7] = {
+		type = "description",
+		title = "Clear log for current character",
+		text = "Type 'yes' to confirm",
+		width = "half",
+	},
+	[8] = {
+		type = "editbox",
+		name = " ",
+		tooltip = "Confirm log file clearing",
+		getFunc = function() return "" end,
+		setFunc = function(text) QuestLog.temp = text end,
+		isMultiline = false,
+		width = "half",
+		default = "",
+	},
+	[9] = {
+		type = "description",
+		text = "|cFF0000Previously completed quests cannot be added again!|r",
+		width = "half",
+	},
+	[10] = {
 		type = "button",
 		name = "Clear log file",
-		tooltip = "Are you sure?",
+		tooltip = "Are you really sure?",
 		func = function()
-					QuestLog.savedVariables.log = nil
-					ReloadUI()
+					if QuestLog.temp == "yes" then
+						QuestLog.savedVariables.log = nil
+						QuestLog.temp = nil
+						ReloadUI()
+					end
 				end,
 		width = "half",
 		warning = "This cannot be undone!\r\nWill need to reload the UI.",
