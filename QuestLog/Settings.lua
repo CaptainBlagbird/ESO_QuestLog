@@ -151,9 +151,16 @@ local optionsTable = {
 	},
 }
 
--- Only use LibAddonMenu if it's available
-if LibStub ~= nil then
-	local LAM = LibStub("LibAddonMenu-2.0")
-	LAM:RegisterAddonPanel("MyAddon", panelData)
-	LAM:RegisterOptionControls("MyAddon", optionsTable)
+
+-- Wait until all addons are loaded
+local function OnPlayerActivated(event)
+	EVENT_MANAGER:UnregisterForEvent(QuestLog.name .. "Settings", EVENT_PLAYER_ACTIVATED)
+	
+	-- Only use LibAddonMenu if it's available
+	if LibStub ~= nil then
+		local LAM = LibStub("LibAddonMenu-2.0")
+		LAM:RegisterAddonPanel("QuestLogOptions", panelData)
+		LAM:RegisterOptionControls("QuestLogOptions", optionsTable)
+	end
 end
+EVENT_MANAGER:RegisterForEvent(QuestLog.name .. "Settings", EVENT_PLAYER_ACTIVATED, OnPlayerActivated)
