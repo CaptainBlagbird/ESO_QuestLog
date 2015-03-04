@@ -14,6 +14,8 @@ QuestLog.name = "QuestLog"
 QuestLog.init = false
 QuestLog.msgColor = "70C0DE"
 QuestLog.msgPrefix = "|r|c" .. QuestLog.msgColor .. "[" .. QuestLog.name .. "] |r|cFFFF00"
+-- Local variables
+local ZONE_INDEX_CYRODIIL = 38
  
 -- Initialisations
 function QuestLog:Init()
@@ -24,7 +26,8 @@ function QuestLog:Init()
 	-- Set up SavedVariables object (for settings)
 	QuestLog.settings = ZO_SavedVars:New("QuestLogSettings", 1, nil, {})
 	if QuestLog.settings.countdownTimeS == nil then QuestLog.settings.countdownTimeS = 30 end
-	if QuestLog.settings.questShareEnabled == nil then QuestLog.settings.questShareEnabled = true end
+	if QuestLog.settings.questShareEnabled == nil then QuestLog.settings.questShareEnabled = false end
+	if QuestLog.settings.displayInCyrodiil == nil then QuestLog.settings.displayInCyrodiil = false end
 	
 	-- -- Restore position
 	QuestLog:RestoreUIPosition()
@@ -155,12 +158,15 @@ function QuestLog.OnQuestComplete(event, name, lvl, pXP, cXP, rnk, pPoints, cPoi
 	
 	-- Check value: Negative = disabled
 	if QuestLog.settings.countdownTimeS >= 0 then
-		if not QuestLog.isPlayerBusy() then
-			-- Start countdown for UI reloading
-			QuestLog.timer.start("dialogCountdown", QuestLog.settings.countdownTimeS*1000)
-		else
-			-- Register events to reload UI when player not busy anymore
-			QuestLog.registerBusyEvents(QuestLog.name .. "WaitBeforeDialog", OnPlayerBusyChangedBeforeDialog)
+		-- Check setting for Cyrodiil
+		if GetCurrentMapZoneIndex() ~= ZONE_INDEX_CYRODIIL or QuestLog.settings.displayInCyrodiil then
+			if not QuestLog.isPlayerBusy() then
+				-- Start countdown for UI reloading
+				QuestLog.timer.start("dialogCountdown", QuestLog.settings.countdownTimeS*1000)
+			else
+				-- Register events to reload UI when player not busy anymore
+				QuestLog.registerBusyEvents(QuestLog.name .. "WaitBeforeDialog", OnPlayerBusyChangedBeforeDialog)
+			end
 		end
 	end
 end

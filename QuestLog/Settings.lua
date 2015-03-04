@@ -12,7 +12,7 @@ local panelData = {
 	name = "QuestLog",
 	displayName = "|c70C0DEQuestLog|r",
 	author = "|c70C0DECaptainBlagbird|r",
-	version = "1.0",
+	version = "1.1",
 	slashCommand = "/questlog",	--(optional) will register a keybind to open to this panel
 	registerForRefresh = true,	--boolean (optional) (will refresh all options controls when a setting is changed and when the panel is shown)
 	registerForDefaults = true,	--boolean (optional) (will set all options controls back to default values)
@@ -74,20 +74,29 @@ local optionsTable = {
 	},
 	[4] = {
 		type = "checkbox",
+		name = "Auto reload UI in Cyrodiil",
+		tooltip = "If OFF, the dialog won't be displayed in Cyrodiil",
+		getFunc = function() return QuestLog.settings.displayInCyrodiil end,
+		setFunc = function(value) QuestLog.settings.displayInCyrodiil = value end,
+		default = false,
+		width = "full",
+	},
+	[5] = {
+		type = "checkbox",
 		name = "Auto share new quests with group",
 		tooltip = "When on, you'll automatically share the quest with the members of your current group so they can decide if they want to start the quest too",
 		getFunc = function() return QuestLog.settings.questShareEnabled end,
 		setFunc = function(value) QuestLog.settings.questShareEnabled = value end,
-		default = true,
+		default = false,
 		width = "full",
 	},
-	[5] = {
+	[6] = {
 		type = "description",
 		title = "Position of the dialog box",
 		text = "",
 		width = "half",
 	},
-	[6] = {
+	[7] = {
 		type = "button",
 		name = "Reset",
 		tooltip = "Reset to default position",
@@ -97,7 +106,7 @@ local optionsTable = {
 				end,
 		width = "half",
 	},
-	[7] = {
+	[8] = {
 		type = "submenu",
 		name = "Danger zone",
 		controls = {
@@ -139,14 +148,14 @@ local optionsTable = {
 			},
 		},
 	},
-	[8] = {
+	[9] = {
 		type = "description",
 		text = "\r\n \r\n \r\n \r\n ",
 		width = "full",
 	},
-	[9] = {
+	[10] = {
 		type = "description",
-		text = "\r\n \r\n \r\n \r\n 'Reset to Defaults' does NOT reset quest log.",
+		text = "\r\n \r\n \r\n 'Reset to Defaults' does NOT reset quest log.",
 		width = "full",
 	},
 }
