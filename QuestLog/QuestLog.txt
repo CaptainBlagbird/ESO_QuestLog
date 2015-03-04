@@ -1,6 +1,6 @@
 ## Title: Quest Log
 ## Author: |c70C0DECaptainBlagbird|r
-## APIVersion: 100010
+## APIVersion: 100011
 ## Description: Logs quest infos (started, abandoned, finished)
 ## SavedVariables: QuestLogFile QuestLogSettings
 ## OptionalDependsOn: LibAddonMenu-2.0
