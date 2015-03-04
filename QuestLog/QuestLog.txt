@@ -5,8 +5,8 @@
 ## SavedVariables: QuestLogFile QuestLogSettings
 ## OptionalDependsOn: LibAddonMenu-2.0
 
-QuestLog.xml
 QuestLog.lua
 Timer.lua
 UI.lua
 Settings.lua
+QuestLog.xml
