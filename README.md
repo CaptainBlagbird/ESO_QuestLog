@@ -1,5 +1,7 @@
 # ESO_QuestLog
 
+## Note: With the new API update it is possible to get a full list of completed quests. So this addon is outdated. Check out my new one: "Quest Map"
+
 This addon logs your quest progress (started/abandoned/completed) and saves it to following file:
 `Elder Scrolls Online\live<eu>\SavedVariables\QuestLog.lua`
 
