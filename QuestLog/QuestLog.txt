@@ -1,4 +1,5 @@
-## Title: Quest Log
+## Title: Quest Log |c555555v1.2|r
+## Version: 1.2
 ## Author: |c70C0DECaptainBlagbird|r
 ## APIVersion: 100011
 ## Description: Logs quest infos (started, abandoned, finished)
